@@ -172,7 +172,7 @@ class SocketBase(object):
         # your certificates against.  If you're using a self-signed key
         # then this is useless to you (and you shouldn't verify)
         # You'll need these if you want to verify your host
-        self._ca_certs = kwargs.get('ca_certs', "/etc/ssl/certs/ca-bundle.crt")
+        self._ca_certs = kwargs.get('ca_certs', "/etc/ssl/certs/ca-certificates.crt")
 
         # These keys are needed for hosting / listen type connections only
         self._keyfile = kwargs.get('keyfile', None)
