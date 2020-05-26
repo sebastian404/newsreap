@@ -17,7 +17,7 @@ from pprint import pformat
 from newsreap.decorators import hook
 
 import logging
-from newsreap.Logging import NEWSREAP_CLI
+from newsreap.Logger import NEWSREAP_CLI
 logger = logging.getLogger(NEWSREAP_CLI)
 
 

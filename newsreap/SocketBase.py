@@ -41,7 +41,7 @@ from .HookManager import HookManager
 
 # Logging
 import logging
-from .Logging import NEWSREAP_ENGINE
+from .Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # Default Binding Address

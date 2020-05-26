@@ -33,11 +33,11 @@ from os.path import isfile
 from os.path import join
 
 try:
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 except ImportError:
     # Path
     sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 
 from newsreap.NNTPnzb import NNTPnzb
 from newsreap.Mime import Mime

@@ -51,9 +51,9 @@ from newsreap.Utils import mkdir
 
 # Logging
 import logging
-from newsreap.Logging import add_handler
-from newsreap.Logging import NEWSREAP_ENGINE
-from newsreap.Logging import SQLALCHEMY_ENGINE
+from newsreap.Logger import add_handler
+from newsreap.Logger import NEWSREAP_ENGINE
+from newsreap.Logger import SQLALCHEMY_ENGINE
 
 # Silence Logging for Tests (uncomment and/or comment as needed)
 # By default having them off is nice because then you can run

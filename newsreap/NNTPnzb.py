@@ -34,7 +34,7 @@ from xml.sax.saxutils import escape as sax_escape
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_LOGGER
+from newsreap.Logger import NEWSREAP_LOGGER
 logger = logging.getLogger(NEWSREAP_LOGGER)
 
 # XML Parsing

@@ -26,7 +26,7 @@ from gevent import sleep
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_CODEC
+from newsreap.Logger import NEWSREAP_CODEC
 logger = logging.getLogger(NEWSREAP_CODEC)
 
 # Adapted from python-yenc but following suite to make everything behave the

@@ -50,7 +50,7 @@ from . import __title__
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 DEFAULT_NNTP_SUBJECT = 'unknown.file'

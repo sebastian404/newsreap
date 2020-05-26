@@ -20,7 +20,7 @@ from newsreap.NNTPGroup import NNTPGroup
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 

@@ -39,7 +39,7 @@ import re
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_LOGGER
+from newsreap.Logger import NEWSREAP_LOGGER
 logger = logging.getLogger(NEWSREAP_LOGGER)
 
 # The following processes a valid filter for processing

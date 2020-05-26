@@ -165,7 +165,7 @@ from newsreap.NNTPIOStream import NNTPIOStream
 from newsreap.Utils import parse_bool
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # NNTP End Of Line

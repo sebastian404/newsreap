@@ -54,7 +54,7 @@ from .NNTPResponse import NNTPResponseCode
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # The workspace we can stage our content in. It's always relative to the

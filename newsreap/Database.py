@@ -25,7 +25,7 @@ from .Utils import parse_url
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # The Group key used to save the database version

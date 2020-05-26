@@ -37,7 +37,7 @@ from newsreap.Utils import SEEK_SET
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # OpenSSL will only write 16K at a time

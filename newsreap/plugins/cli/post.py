@@ -22,12 +22,12 @@ from os.path import abspath
 from os.path import dirname
 
 try:
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 
 except ImportError:
     # Path
     sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 
 from newsreap.NNTPPostFactory import NNTPPostFactory
 

@@ -64,7 +64,7 @@ from .codecs.CodecYenc import CodecYenc
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 # Defines the end of data delimiter
