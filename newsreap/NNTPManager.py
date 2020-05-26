@@ -227,7 +227,7 @@ class NNTPManager(object):
         self._work_queue = Queue()
 
         # Map signal
-        gevent.signal(signal.SIGQUIT, gevent.kill)
+        gevent.hub.signal(signal.SIGQUIT, gevent.kill)
 
         # Define our hooks (if any)
         self.hooks = HookManager()
