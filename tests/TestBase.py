@@ -73,7 +73,7 @@ class TestBase(unittest.TestCase):
             'config.yaml',
         )
         stream = file(self.config_file, 'r')
-        self.config = yaml.load(stream)
+        self.config = yaml.safe_load(stream)
         self.test_dir = join(
             gettempdir(),
             'nntp-test-%s' % getuser(),

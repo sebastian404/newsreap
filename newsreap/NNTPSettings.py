@@ -421,7 +421,7 @@ class NNTPSettings(NNTPDatabase):
         # Append our new data
         cfg_file = abspath(expanduser(cfg_file))
         try:
-            cfg_data = yaml.load(file(cfg_file, 'r'))
+            cfg_data = yaml.safe_load(file(cfg_file, 'r'))
             logger.debug('Successfully parsed YAML configuration from %s' % (
                 cfg_file,
             ))
