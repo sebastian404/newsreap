@@ -39,7 +39,7 @@ from newsreap.objects.nntp.Common import get_groups
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_CLI
+from newsreap.Logger import NEWSREAP_CLI
 logger = logging.getLogger(NEWSREAP_CLI)
 
 NEWSREAP_CLI_PLUGINS = {

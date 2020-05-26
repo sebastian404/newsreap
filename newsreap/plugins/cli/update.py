@@ -37,11 +37,11 @@ from shutil import move
 
 
 try:
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 except ImportError:
     # Path
     sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 
 from newsreap.objects.nntp.Group import Group
 from newsreap.objects.nntp.GroupAlias import GroupAlias

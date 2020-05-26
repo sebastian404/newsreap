@@ -19,7 +19,7 @@ from newsreap.codecs.CodecBase import CodecBase
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_CODEC
+from newsreap.Logger import NEWSREAP_CODEC
 logger = logging.getLogger(NEWSREAP_CODEC)
 
 # Defines the new line delimiter

@@ -60,7 +60,7 @@ from newsreap.Utils import hexdump
 from newsreap.Utils import dirsize
 
 import logging
-from newsreap.Logging import NEWSREAP_ENGINE
+from newsreap.Logger import NEWSREAP_ENGINE
 logging.getLogger(NEWSREAP_ENGINE).setLevel(logging.DEBUG)
 
 

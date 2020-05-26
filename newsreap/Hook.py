@@ -18,7 +18,7 @@ from blist import sortedset
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_HOOKS
+from newsreap.Logger import NEWSREAP_HOOKS
 logger = logging.getLogger(NEWSREAP_HOOKS)
 
 

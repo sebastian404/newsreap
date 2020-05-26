@@ -54,7 +54,7 @@ from .NNTPSettings import DEFAULT_BLOCK_SIZE as BLOCK_SIZE
 
 # Logging
 import logging
-from .Logging import NEWSREAP_ENGINE
+from .Logger import NEWSREAP_ENGINE
 logger = logging.getLogger(NEWSREAP_ENGINE)
 
 

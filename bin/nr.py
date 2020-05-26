@@ -135,7 +135,7 @@ from newsreap.Utils import scan_pylib
 from newsreap.Utils import load_pylib
 
 # Logging
-from newsreap.Logging import *
+from newsreap.Logger import *
 import logging
 logger = logging.getLogger(NEWSREAP_CLI)
 

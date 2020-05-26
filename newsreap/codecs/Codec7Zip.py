@@ -31,7 +31,7 @@ from newsreap.Utils import rm
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_CODEC
+from newsreap.Logger import NEWSREAP_CODEC
 logger = logging.getLogger(NEWSREAP_CODEC)
 
 # 7-Zip Binary Path

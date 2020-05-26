@@ -27,7 +27,7 @@ from newsreap.NNTPIOStream import NNTP_DEFAULT_ENCODING
 
 # Logging
 import logging
-from newsreap.Logging import NEWSREAP_CODEC
+from newsreap.Logger import NEWSREAP_CODEC
 logger = logging.getLogger(NEWSREAP_CODEC)
 
 # Defines the parsing of an XOVER Response Entry

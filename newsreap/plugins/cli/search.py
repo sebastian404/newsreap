@@ -25,11 +25,11 @@ from os.path import dirname
 from os.path import abspath
 
 try:
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 except ImportError:
     # Path
     sys.path.insert(0, dirname(dirname(dirname(dirname(abspath(__file__))))))
-    from newsreap.Logging import NEWSREAP_CLI
+    from newsreap.Logger import NEWSREAP_CLI
 
 from newsreap.objects.group.Article import Article
 from newsreap.objects.nntp.Common import get_groups
