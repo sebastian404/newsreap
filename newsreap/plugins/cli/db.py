@@ -118,7 +118,7 @@ def database_reset(ctx):
     ctx['NNTPSettings'].open(reset=True)
     __db_prep(ctx)
 
-    db_path = join(ctx['NNTPSettings'].base_dir, 'cache', 'search')
+    db_path = join(ctx['NNTPSettings'].work_dir, 'cache', 'search')
     logger.debug('Scanning %s for databases...' % db_path)
     with pushd(db_path, create_if_missing=True):
         for entry in listdir(db_path):
@@ -164,8 +164,8 @@ def database_status(ctx):
 
     try:
         # Get a list of watched groups
-        groups = dict(session.query(Group.name, Group.id)
-                      .filter(Group.watch == pep8_e712).all())
+        groups = session.query(Group.name)\
+                         .filter(Group.watch == pep8_e712).all()
 
     except OperationalError:
         # Get a list of watched groups
@@ -173,7 +173,7 @@ def database_status(ctx):
         logger.info('Try running: "nr db init" first.')
         exit(0)
 
-    if not len(results):
+    if not len(groups):
         logger.info('There are no groups configured to be watched.')
         exit(0)
 

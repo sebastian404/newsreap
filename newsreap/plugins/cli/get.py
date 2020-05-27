@@ -47,13 +47,20 @@ from newsreap.NNTPGetFactory import NNTPGetFactory
 logger = logging.getLogger(NEWSREAP_CLI)
 
 # Define our function
-NEWSREAP_CLI_PLUGINS = 'get'
+NEWSREAP_CLI_PLUGINS = {
+    # format:
+    # cli short hand group: function prefix
+    'get': {
+        'prefix': 'get',
+        'desc': 'article managment',
+    },
+}
 
 
-@click.command()
+
+@click.command(name='get')
 @click.pass_obj
-@click.option('--group', type=basestring,
-              default=None,
+@click.option('--group', type=basestring,default=None,
               help="Identify the group to reference")
 @click.option('--workdir', type=basestring, default=None,
               help="A directory we can manage our fetched content from.")

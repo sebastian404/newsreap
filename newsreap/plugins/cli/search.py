@@ -198,7 +198,7 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
         exit(1)
 
     for name, _id in groups.iteritems():
-        db_path = join(ctx['NNTPSettings'].cfg_path, 'cache', 'search')
+        db_path = join(ctx['NNTPSettings'].work_dir, 'cache', 'search')
         db_file = '%s%s' % (
             join(db_path, name),
             SQLITE_DATABASE_EXTENSION,
@@ -296,8 +296,8 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
         # Iterate through our list
         print("%s:" % (name))
         for entry in gt:
-            print("  [%.5d] %.4d %s" % (
-                entry.article_no, entry.score, entry.subject))
+            print("  [%s] %.4d %s" % (
+                entry.message_id, entry.score, entry.subject))
 
         group_session.close()
         db.close()
