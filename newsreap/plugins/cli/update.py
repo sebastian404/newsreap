@@ -244,8 +244,7 @@ def update_search(ctx, groups, date_from, date_to, watched):
     s = ctx['NNTPSettings'].nntp_servers[0]
     try:
         _server = session.query(Server)\
-            .filter(Server.host == s['host'])\
-            .filter(Server.port == s['port']).first()
+            .filter(Server.host == s['host']).first()
 
     except (InvalidRequestError, OperationalError):
         # Database isn't set up
@@ -273,7 +272,7 @@ def update_search(ctx, groups, date_from, date_to, watched):
 
     for name, _id in groups.iteritems():
 
-        db_path = join(ctx['NNTPSettings'].cfg_path, 'cache', 'search')
+        db_path = join(ctx['NNTPSettings'].work_dir, 'cache', 'search')
         db_file = '%s%s' % (
             join(db_path, name),
             SQLITE_DATABASE_EXTENSION,
@@ -329,6 +328,7 @@ def update_search(ctx, groups, date_from, date_to, watched):
         # begin fetching from that point.  The index "MUST" but the one
         # associated with our server hostname. If one doesn't exist; create
         # it initialized at 0
+
         logger.debug('Retrieving information on group %s' % (name))
         gt = session.query(GroupTrack)\
                     .filter(GroupTrack.group_id == _id)\
@@ -336,7 +336,8 @@ def update_search(ctx, groups, date_from, date_to, watched):
 
         if not gt or reset:
             # Get an connection to work with
-            con = ctx['NNTPManager'].get_connection()
+            # con = ctx['NNTPManager'].get_connection()
+            con = NNTPConnection(**s)
 
             _, low, high, _ = con.group(name)
             if low is None:
