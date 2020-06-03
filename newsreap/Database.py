@@ -164,36 +164,6 @@ class Database(object):
             # Reset _exists flag
             self._exists = False
 
-        if self._exists is None:
-            # The below works, but it's too hacky and requires us to identify
-            # every single database type and handle them differently.
-            # Surely there is a way we can test the schema (perhaps a version
-            # stored in the database controlled by this class) and if the
-            # versions don't match (or can't be retrieved, then we can handle
-            # messaging that the database isn't initialized.
-            try:
-                self._version = [(v.key, int(v.value))
-                                 for v in self._session.query(self.Vsp)
-                                 .filter_by(group=VSP_VERSION_GROUP)
-                                 .order_by(self.Vsp.order).all()]
-
-                # Toggle Exists Flag
-                self._exists = True
-
-            except (ValueError, TypeError):
-                # int() failed; what the heck does this database have in
-                # it anyway?
-                logger.warning(
-                    'The database appears to have an integrity issue.',
-                )
-                # Toggle Exists Flag; if there really is a problem,
-                # let it fail elsewhere... we've given warning already
-                self._exists = True
-
-            except OperationalError:
-                # Table doesn't exist
-                self._exists = False
-
         if reset is False:
             if len(self._version) == 0 or \
                len(set(self._version) - set(VSP_VERSION_KEYS)):

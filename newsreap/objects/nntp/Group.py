@@ -50,7 +50,7 @@ class Group(ObjectBase):
     count = Column(Integer, nullable=False, default=0)
 
     # group flags (associated with group)
-    flags = Column(String, nullable=False, default='')
+    flags = Column(String(256), nullable=False, default='')
 
     # watch flag
     watch = Column(Boolean, nullable=False, default=False, index=True)
