@@ -334,9 +334,11 @@ def update_search(ctx, groups, date_from, date_to, watched):
                     .filter(GroupTrack.group_id == _id)\
                     .filter(GroupTrack.server_id == _server.id).first()
 
+
+
         if not gt or reset:
+            logger.warning('No GroupTrack found for %s' % (name))
             # Get an connection to work with
-            # con = ctx['NNTPManager'].get_connection()
             con = NNTPConnection(**s)
 
             _, low, high, _ = con.group(name)
@@ -359,10 +361,11 @@ def update_search(ctx, groups, date_from, date_to, watched):
             )
             group_session.commit()
             session.add(gt)
+            session.commit()
 
         # Initialize our high/low variables
-        low = gt.high
-        high = gt.low
+        low = gt.low
+        high = gt.high
 
         # starting pointer
         cur = gt.scan_pointer + 1
