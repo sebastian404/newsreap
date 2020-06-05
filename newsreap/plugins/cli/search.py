@@ -21,6 +21,7 @@ import re
 
 from os.path import join
 from os.path import isfile
+from os.path import exists
 from os.path import dirname
 from os.path import abspath
 
@@ -209,9 +210,14 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
             )
             continue
 
+        reset = not exists(db_file)
+
         engine = 'sqlite:///%s' % db_file
-        db = NNTPGroupDatabase(engine=engine, reset=None)
+        db = NNTPGroupDatabase(engine=engine, reset=reset)
         group_session = db.session()
+        if not group_session:
+            logger.warning("The database %s not be accessed." % db_file)
+            continue
 
         gt = group_session.query(Article)
 
