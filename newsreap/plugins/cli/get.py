@@ -60,9 +60,9 @@ NEWSREAP_CLI_PLUGINS = {
 
 @click.command(name='get')
 @click.pass_obj
-@click.option('--group', type=basestring,default=None,
+@click.option('--group', default=None,
               help="Identify the group to reference")
-@click.option('--workdir', type=basestring, default=None,
+@click.option('--workdir', default=None,
               help="A directory we can manage our fetched content from.")
 @click.option('--headers', default=False, flag_value=True,
               help="Return header details")
@@ -84,6 +84,10 @@ def get(ctx, group, workdir, headers, inspect, sources, hooks):
         logger.error("You must specify at least one source.")
         exit(1)
 
+    # Get tempory directory for download
+    if not workdir:
+        workdir = join(ctx['NNTPSettings'].work_dir, 'tmp')
+
     # Link to our NNTP Manager
     mgr = ctx['NNTPManager']
 
@@ -96,7 +100,7 @@ def get(ctx, group, workdir, headers, inspect, sources, hooks):
 
     for source in sources:
 
-        if not gf.load(source):
+        if not gf.load(source, work_dir=workdir):
             return_code = 1
             continue
 
@@ -104,6 +108,10 @@ def get(ctx, group, workdir, headers, inspect, sources, hooks):
             # We're just here to fetch content
             if not gf.download():
                 # our download failed
+                return_code = 1
+
+            # clean up
+            if not gf.clean():
                 return_code = 1
 
             # Move on
@@ -133,6 +141,7 @@ def get(ctx, group, workdir, headers, inspect, sources, hooks):
 
         # Print our response
         print(gf.str(headers=headers, inspect=inspect))
+
 
     # return our return code
     exit(return_code)

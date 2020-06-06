@@ -184,10 +184,10 @@ class NNTPGetFactory(object):
             pass
 
 
-    def load(self, source, hooks=True, groups=None, path=None,
+    def load(self, source, hooks=True, groups=None, path=None, work_dir=None,
              *args, **kwargs):
         """
-        Takes a Message-ID or NZB-File (aource) and retrieves the content
+        Takes a Message-ID or NZB-File (source) and retrieves the content
 
         If hooks is set to True, it will continue using whatever hooks are
         already in place.  Otherwise you can define your own hooks here
@@ -230,6 +230,9 @@ class NNTPGetFactory(object):
 
         # Start by defining our base path
         self.base_path = path
+
+        # define temporary directory we will work with
+        self.work_path = work_dir
 
         if groups is not None:
             # Update our groups if new ones were specified
@@ -282,10 +285,10 @@ class NNTPGetFactory(object):
             return False
 
         # A temporary directory we will work with until we're done
-        self.tmp_path = join(self.base_path, '{}.tmp'.format(self.name))
+        self.tmp_path = join(self.work_path, '{}.tmp'.format(self.name))
 
         # The path to our database for managing our retrieved content
-        self.db_path = join(self.base_path, '{}.db'.format(self.name))
+        self.db_path = join(self.work_path, '{}.db'.format(self.name))
         self.engine = 'sqlite:///%s' % self.db_path
         self._db = None
 
@@ -901,6 +904,7 @@ class NNTPGetFactory(object):
         Eliminate all content in the temporary working directory for a
         given prepable download
         """
+
         if not rm(self.tmp_path):
             logger.error(
                 "Could not remove temporary directory '%s'." %
