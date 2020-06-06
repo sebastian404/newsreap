@@ -755,7 +755,7 @@ class NNTPnzb(NNTPContent):
             tmpfname = basename(self.filepath)
 
             # Strip our extension off the end (if present)
-            result = NZB_EXTENSION_RE(tmpfname)
+            result = NZB_EXTENSION_RE.search(tmpfname)
             if result and result.group('fname'):
                 # Store our new filename as our name
                 _name = result.group('fname')
