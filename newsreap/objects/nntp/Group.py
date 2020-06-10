@@ -41,7 +41,7 @@ class Group(ObjectBase):
     id = Column(Integer, Sequence('id_seq'), primary_key=True)
 
     # group name
-    name = Column(String(128), nullable=False, unique=True, index=True)
+    name = Column(String(256), nullable=False, unique=True, index=True)
 
     # Some statistics that are just fetched from the NNTP Server; this
     # is a lose value since counts will vary across multiple usenet
