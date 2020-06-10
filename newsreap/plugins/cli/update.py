@@ -721,24 +721,19 @@ def update_index(ctx, workdir, groups, watched):
         logger.error("There were not groups identified for indexing.")
         exit(1)
 
+    groups = get_groups(session=session, lookup=groups, watched=watched)
+    if not groups:
+        logger.error("There were not groups identified for searching.")
+        exit(1)
+
     # Maintain a list of completed groups; This allows us to not
     # parse a group twice
     completed = list()
 
-    for group in groups:
-        _group = group.lower().strip()
+    for name, _id in groups.iteritems():       
+        _group = name.lower().strip()
         if not _group:
             continue
-
-        _id = session.query(Group.id).filter(Group.name == _group).first()
-        if not _id:
-            # No problem; let us use the alias too
-            _id = session.query(Group.id)\
-                         .join(GroupAlias)\
-                         .filter(GroupAlias.name == _group).first()
-            if not _id:
-                logger.warning("The group '%s' does not exist." % group)
-                continue
 
         if _id in completed:
             # We've indexed this group
@@ -749,7 +744,7 @@ def update_index(ctx, workdir, groups, watched):
         # get patch to groups cache db
         db_path = join(ctx['NNTPSettings'].work_dir, 'cache', 'search')
         db_file = '%s%s' % (
-            join(db_path, group),
+            join(db_path, name),
             SQLITE_DATABASE_EXTENSION,
         )
         if not isfile(db_file):
@@ -772,7 +767,8 @@ def update_index(ctx, workdir, groups, watched):
         # associated with our server hostname. If one doesn't exist; create
         # it initialized at 0
 
-        logger.info('Retrieving information on group %s' % (group))
+        logger.info('Retrieving information on group %s' % (name))
+
         gt = session.query(GroupTrack)\
                     .filter(GroupTrack.group_id == _id)\
                     .filter(GroupTrack.server_id == _server.id).first()
@@ -801,7 +797,7 @@ def update_index(ctx, workdir, groups, watched):
         if articles.count():
             # Initialize our GetFactory
             mgr = ctx['NNTPManager']
-            gf = NNTPGetFactory(connection=mgr, groups=group)
+            gf = NNTPGetFactory(connection=mgr, groups=name)
 
             index_high = articles.count()
             index_cur = 0
