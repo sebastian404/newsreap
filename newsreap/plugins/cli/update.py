@@ -21,6 +21,7 @@ import sys
 
 from os.path import join
 from os.path import isdir
+from os.path import isfile
 from os.path import exists
 from os.path import dirname
 from os.path import abspath
@@ -56,6 +57,7 @@ from sqlalchemy.exc import IntegrityError
 from newsreap.NNTPConnection import XoverGrouping
 from newsreap.NNTPGroupDatabase import NNTPGroupDatabase
 from newsreap.NNTPConnection import NNTPConnection
+from newsreap.NNTPGetFactory import NNTPGetFactory
 from newsreap.NNTPSettings import SQLITE_DATABASE_EXTENSION
 
 from newsreap.Utils import mkdir
@@ -257,7 +259,7 @@ def update_search(ctx, groups, date_from, date_to, watched):
 
     groups = get_groups(session=session, lookup=groups, watched=watched)
     if not groups:
-        logger.error("There were not groups identified for indexing.")
+        logger.error("There were not groups identified for searching.")
         exit(1)
 
     # Get our RamDisk if we got one
@@ -654,24 +656,50 @@ def update_search(ctx, groups, date_from, date_to, watched):
 # all functions are prefixed with what is identified
 # above or they are simply ignored.
 @click.command(name='index')
+@click.option('--workdir', default=None,help="A directory we can manage our fetched content from.")
 @click.argument('groups', nargs=-1)
 @click.option('--watched', '-w', is_flag=True, help='All watched groups.')
 @click.pass_obj
-def update_index(ctx, groups, watched):
+def update_index(ctx, workdir, groups, watched):
     """
-    TODO Updating Indexes (Generate NZBFiles).
+    Updating Indexes (download NZBFiles).
 
     If a group(s) is/are specified on the command line, then just those
     are indexed as well.
 
     """
+    # Use our Database first if it exists
     session = ctx['NNTPSettings'].session()
     if not session:
+        logger.error('Could not acquire a database connection.')
+        exit(1)
+
+    if not len(ctx['NNTPSettings'].nntp_servers) > 0:
+        logger.error("There are no servers defined.")
+        exit(1)
+
+    # Store Primary server
+    s = ctx['NNTPSettings'].nntp_servers[0]
+    try:
+        _server = session.query(Server)\
+            .filter(Server.host == s['host']).first()
+
+    except (InvalidRequestError, OperationalError):
+        # Database isn't set up
         logger.error("The database is not correctly configured.")
         exit(1)
 
-    # Track our database updates
-    pending_commits = 0
+    if not _server:
+        logger.error("Server entry is not in the database.")
+        exit(1)
+
+    # Get tempory directory for download
+    if not workdir:
+        workdir = join(ctx['NNTPSettings'].work_dir, 'tmp')
+
+    # initialize our return code to zero (0) which means okay
+    # but we'll toggle it if we have any sort of failure
+    return_code = 0
 
     # PEP8 E712 does not allow us to make a comparison to a boolean value
     # using the == instead of the keyword 'in'.  However SQLAlchemy
@@ -686,6 +714,7 @@ def update_index(ctx, groups, watched):
         if not _groups:
             logger.error("There are no current groups being watched.")
             exit(1)
+
         groups = set(groups) | set([g[0] for g in _groups])
 
     if not groups:
@@ -715,12 +744,113 @@ def update_index(ctx, groups, watched):
             # We've indexed this group
             continue
 
-        # TODO Index Group based on It's placeholders in GroupTrack
+        # Index Group based on It's placeholders in GroupTrack
+
+        # get patch to groups cache db
+        db_path = join(ctx['NNTPSettings'].work_dir, 'cache', 'search')
+        db_file = '%s%s' % (
+            join(db_path, group),
+            SQLITE_DATABASE_EXTENSION,
+        )
+        if not isfile(db_file):
+            logger.warning("There is no cached content for '%s'." % db_file)
+            continue
+
+        reset = not exists(db_file)
+
+        engine = 'sqlite:///%s' % db_file
+        reset = not exists(db_file)
+        db = NNTPGroupDatabase(engine=engine, reset=reset)
+        group_session = db.session()
+        if not group_session:
+            logger.error("The database %s is not accessible.." % db_file)
+            continue
+
+        # TODO:
+        # Get current index associated with our primary group so we can
+        # begin fetching from that point.  The index "MUST" but the one
+        # associated with our server hostname. If one doesn't exist; create
+        # it initialized at 0
+
+        logger.info('Retrieving information on group %s' % (group))
+        gt = session.query(GroupTrack)\
+                    .filter(GroupTrack.group_id == _id)\
+                    .filter(GroupTrack.server_id == _server.id).first()
+
+        if not gt:
+            logger.warning('No GroupTrack found for %s' % (group))
+            continue
+
+        # Initialize our high/low variables
+        low = gt.low
+        high = gt.high
+
+        # starting pointer
+        cur = gt.index_pointer + 1
+
+        logger.info('Indexing from %d to %d [%d article(s)]' % (
+                    cur, high, (high - cur + 1)))
+
+        # search cache for NZB since the last index
+        articles = group_session.query(Article)\
+                          .filter(Article.subject.ilike('%%%s%%' % 'nzb'))\
+                          .filter(Article.article_no.between(cur, high))\
+                          .order_by(Article.article_no.asc())
+
+        # assuming have something to index
+        if articles.count():
+            # Initialize our GetFactory
+            mgr = ctx['NNTPManager']
+            gf = NNTPGetFactory(connection=mgr, groups=group)
+
+            index_high = articles.count()
+            index_cur = 0
+
+            # Iterate through our list of matched articles
+            for entry in articles:
+                # Get the current time for our timer
+                cur_time = datetime.now()
+
+                # download NZB
+                if not gf.load(entry.message_id, work_dir=workdir):
+                    return_code = 1
+                    continue
+
+                if not gf.download():
+                    # our download failed
+                    return_code = 1
+                    continue
+
+                # clean up after download
+                if not gf.clean():
+                    return_code = 1
+                    continue
+
+                # Update our marker
+                session.query(GroupTrack)\
+                    .filter(GroupTrack.group_id == _id)\
+                    .filter(GroupTrack.server_id == _server.id)\
+                    .update({
+                        GroupTrack.index_pointer: entry.article_no,
+                        GroupTrack.last_index: datetime.now(),
+                    })
+
+                # Save this now as it allows for Cntrl-C or aborts
+                # To take place and we'll resume from where we left off
+                session.commit()
+
+                index_cur = index_cur + 1
+
+                # Calculate Processing Time
+                delta_time = datetime.now() - cur_time
+                delta_time = (delta_time.days * 86400) + delta_time.seconds + (delta_time.microseconds / 1e6)
+                logger.info('indexed article (%d) in %s sec(s) [remaining=%d]' % (entry.article_no, delta_time, (index_high - index_cur)))
 
         # Append to completed list (this prevents us from processing entries
         # twice)
         completed.append(_id)
 
-    if pending_commits > 0:
-        # commit our results
-        session.commit()
+    session.close()
+    group_session.close()
+    db.close()
+
