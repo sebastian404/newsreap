@@ -2238,8 +2238,6 @@ class NNTPConnection(SocketBase):
                     codec_active = next(
                         (d for d in decoders
                             if d.detect(data) is not None), None)
-                    if codec_active:
-                        logger.debug('Decoding using %s' % type(codec_active))
 
                 # Based on previous check; we may actually have an active codec
                 # now if we don't have one yet; well want to store the content
@@ -2260,6 +2258,7 @@ class NNTPConnection(SocketBase):
                 self._data.seek(d_head, SEEK_SET)
 
                 # Begin decoding content
+                logger.debug('Decoding using %s' % type(codec_active))
                 decoded = codec_active.decode(self._data)
 
                 # Adjust our pointer

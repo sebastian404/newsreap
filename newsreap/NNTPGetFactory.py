@@ -376,7 +376,7 @@ class NNTPGetFactory(object):
             logger.debug("Handling Message-ID '%s'." % (self.name))
 
             response = self.connection.get(
-                self.name, work_dir=self.path, decoders=False,
+                self.name, work_dir=self.tmp_path,
                 group=self.groups)
 
             if response is None:
@@ -390,11 +390,16 @@ class NNTPGetFactory(object):
                 ext=self.message_id_file_extension,
             )
 
-            if not response.body.save(self.path):
-                logger.error("Could not save Message-ID to '%s'." % (
-                    self.path,
-                ))
-                return False
+            # if check if we managed to decode anything
+            if response.decoded:
+                for attachment in response.decoded:
+                    if not attachment.save(self.path):
+                        logger.error("Could not save attachment to '%s'." % (self.path))
+                        return False
+            else:
+                if not response.body.save(self.path):
+                    logger.error("Could not save Message-ID to '%s'." % (self.path))
+                    return False
 
             return True
 
