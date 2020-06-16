@@ -35,6 +35,13 @@ except ImportError:
 from newsreap.objects.group.Article import Article
 from newsreap.objects.nntp.Common import get_groups
 
+from newsreap.NNTPnzb import NNTPnzb
+from newsreap.NNTPnzb import NZBParseMode
+
+from newsreap.NNTPBinaryContent import NNTPBinaryContent
+from newsreap.NNTPArticle import NNTPArticle
+from newsreap.NNTPSegmentedPost import NNTPSegmentedPost
+
 from sqlalchemy import not_
 
 from newsreap.NNTPGroupDatabase import NNTPGroupDatabase
@@ -125,8 +132,9 @@ def parse_search_keyword(keywords):
 @click.option('--minscore', '-A', default=0, type=int)
 @click.option('--maxscore', '-B', default=9999, type=int)
 @click.option('--case-insensitive', '-i', is_flag=True)
+@click.option('--nzb', '-n', is_flag=True)
 @click.pass_obj
-def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
+def search(ctx, group, keywords, minscore, maxscore, case_insensitive, nzb):
     """
     Searches cached groups for articles.
 
@@ -299,13 +307,34 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
 
         gt = gt.order_by(Article.score.desc())
 
-        # Iterate through our list
-        print("%s:" % (name))
-        for entry in gt:
-            print("  [%s] %.4d %s" % (
-                entry.message_id, entry.score, (entry.subject).encode('ascii', 'ignore')))
-
         group_session.close()
         db.close()
+
+        if nzb:
+            # make an NZB file from our results
+            nzb_file = '_'.join(keywords)+'.nzb'
+            nzb = NNTPnzb(nzb_file, work_dir='/tmp/',)
+
+            # Iterate through our list
+            for entry in gt:
+                # create segment/artical for each
+                content = NNTPBinaryContent()
+                article = NNTPArticle(str(entry.message_id))
+                segment = NNTPSegmentedPost('', poster=entry.poster, subject=entry.subject, utc=entry.posted_date, groups=name)
+
+                # Add Content to the article to Segment to NZB
+                article.add(content)
+                segment.add(article)
+                nzb.add(segment)
+
+            # save NZB file
+            nzb.save()
+
+        else:
+            # Iterate through our list
+            print("%s:" % (name))
+            for entry in gt:
+                print("  [%s] %.4d %s" % (
+                    entry.message_id, entry.score, (entry.subject).encode('ascii', 'ignore')))
 
     return
