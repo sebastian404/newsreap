@@ -303,7 +303,7 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive):
         print("%s:" % (name))
         for entry in gt:
             print("  [%s] %.4d %s" % (
-                entry.message_id, entry.score, entry.subject))
+                entry.message_id, entry.score, (entry.subject).encode('ascii', 'ignore')))
 
         group_session.close()
         db.close()
