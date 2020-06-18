@@ -38,7 +38,7 @@ from newsreap.objects.nntp.Common import get_groups
 from newsreap.NNTPnzb import NNTPnzb
 from newsreap.NNTPnzb import NZBParseMode
 
-from newsreap.NNTPBinaryContent import NNTPBinaryContent
+from newsreap.NNTPEmptyContent import NNTPEmptyContent
 from newsreap.NNTPArticle import NNTPArticle
 from newsreap.NNTPSegmentedPost import NNTPSegmentedPost
 
@@ -317,13 +317,14 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive, nzb):
 
             # Iterate through our list
             for entry in gt:
-                # create segment/artical for each
-                content = NNTPBinaryContent()
-                article = NNTPArticle(str(entry.message_id))
+                # create segment/artical for each result
                 segment = NNTPSegmentedPost('', poster=entry.poster, subject=entry.subject, utc=entry.posted_date, groups=name)
+                article = NNTPArticle(str(entry.message_id))
 
-                # Add Content to the article to Segment to NZB
-                article.add(content)
+                # add empty content placeholder to articak
+                article.add(NNTPEmptyContent('', total_size=entry.size))
+
+                # Add Article to Segment to NZB
                 segment.add(article)
                 nzb.add(segment)
 
