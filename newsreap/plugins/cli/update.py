@@ -539,7 +539,7 @@ def update_search(ctx, groups, date_from, date_to, watched):
                         "poster": article['poster'],
                         "size": article['size'],
                         "lines": article['lines'],
-                        "date": article['date'],
+                        "posted_date": article['date'],
                         "score": article['score'],
                     } for article in response.itervalues()]
                 )
