@@ -317,11 +317,11 @@ def search(ctx, group, keywords, minscore, maxscore, case_insensitive, nzb):
 
             # Iterate through our list
             for entry in gt:
-                # create segment/artical for each result
+                # create segment/article for each result
                 segment = NNTPSegmentedPost('', poster=entry.poster, subject=entry.subject, utc=entry.posted_date, groups=name)
                 article = NNTPArticle(str(entry.message_id))
 
-                # add empty content placeholder to articak
+                # add empty content placeholder to article
                 article.add(NNTPEmptyContent('', total_size=entry.size))
 
                 # Add Article to Segment to NZB
