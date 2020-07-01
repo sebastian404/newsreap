@@ -797,7 +797,7 @@ def update_index(ctx, workdir, groups, watched):
         if articles.count():
             # Initialize our GetFactory
             mgr = ctx['NNTPManager']
-            gf = NNTPGetFactory(connection=mgr, groups=name)
+            gf = NNTPGetFactory(connection=mgr, decode=True, groups=name)
 
             index_high = articles.count()
             index_cur = 0

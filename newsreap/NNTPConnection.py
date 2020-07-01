@@ -1649,7 +1649,7 @@ class NNTPConnection(SocketBase):
             logger.error('Could not create directory %s' % work_dir)
             return None
 
-        if decoders is None:
+        if decoders is True:
             # Prepare a default list of decoders
             decoders = list()
             if not self.use_body:

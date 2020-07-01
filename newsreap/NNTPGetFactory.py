@@ -66,7 +66,7 @@ class NNTPGetFactory(object):
     # Used for calculating queue sizes
     xfer_rate_max_queue_size = 20
 
-    def __init__(self, connection=None, hooks=None, groups=None,
+    def __init__(self, connection=None, hooks=None, decode=None, groups=None,
                  *args, **kwargs):
         """
         Initializes an NNTPGetFactory object
@@ -114,6 +114,9 @@ class NNTPGetFactory(object):
         if hooks:
             # load our hooks
             self.hooks.add(hooks, ('.', self.default_hook_path))
+
+        # A flag to decode when downloading by Message-ID
+        self.decode = decode
 
         # The path to our database for managing our staged content
         self.db_path = None
@@ -386,11 +389,11 @@ class NNTPGetFactory(object):
             return False
 
         if self.nzb is None:
-            # We are dealing with a Message-ID; retrieval occurs without codecs
+            # We are dealing with a Message-ID
             logger.debug("Handling Message-ID '%s'." % (self.name))
 
             response = self.connection.get(
-                self.name, work_dir=self.tmp_path,
+                self.name, work_dir=self.tmp_path, decoders=self.decode,
                 group=self.groups)
 
             if response is None:
@@ -404,7 +407,7 @@ class NNTPGetFactory(object):
                 ext=self.message_id_file_extension,
             )
 
-            # if check if we managed to decode anything
+            # check if we managed to decode anything
             if response.decoded:
                 for attachment in response.decoded:
                     if not attachment.save(self.path):
@@ -444,7 +447,7 @@ class NNTPGetFactory(object):
         self.nzb.mode(NZBParseMode.IgnorePars)
 
         # We are dealing with an NZB-File if we get here
-        response = self.connection.get(self.nzb, work_dir=self.tmp_path)
+        response = self.connection.get(self.nzb, decoders=True, work_dir=self.tmp_path)
 
         # Deobsfucate re-scans the existing NZB-Content and attempts to pair
         # up filenames to their records (if they exist).  A refresh does

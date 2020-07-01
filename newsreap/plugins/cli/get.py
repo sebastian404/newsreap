@@ -68,10 +68,12 @@ NEWSREAP_CLI_PLUGINS = {
               help="Return header details")
 @click.option('--inspect', default=False, flag_value=True,
               help="Inspect the first few bytes of the body only")
+@click.option('--decode', '-d', default=False, flag_value=True,
+              help="Attempt decode when downloading by Message-ID")
 @click.option('--hooks', '-k', default=None, type=str,
               help='Specify one or more hooks to load')
 @click.argument('sources', nargs=-1)
-def get(ctx, group, workdir, headers, inspect, sources, hooks):
+def get(ctx, group, workdir, headers, inspect, sources, decode, hooks):
     """
     Retrieves content from Usenet when provided a NZB-File and/or a Message-ID
     """
@@ -92,7 +94,7 @@ def get(ctx, group, workdir, headers, inspect, sources, hooks):
     mgr = ctx['NNTPManager']
 
     # Initialize our GetFactory
-    gf = NNTPGetFactory(connection=mgr, hooks=hooks, groups=group)
+    gf = NNTPGetFactory(connection=mgr, hooks=hooks, decode=decode, groups=group)
 
     # initialize our return code to zero (0) which means okay
     # but we'll toggle it if we have any sort of failure
