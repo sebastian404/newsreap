@@ -325,33 +325,31 @@ def update_search(ctx, groups, date_from, date_to, watched):
             logger.warning("The database %s not be accessed." % db_file)
             continue
 
-        # TODO:
+        logger.debug('Retrieving information on group %s' % (name))
+
+        # Get an connection to work with
+        con = NNTPConnection(**s)
+
+        _, low, high, _ = con.group(name)
+        if low is None:
+            # Could not set group
+            logger.warning("Could not access group '%s' on '%s'." % (
+                name,
+                _server.host,
+            ))
+            continue
+
         # Get current index associated with our primary group so we can
-        # begin fetching from that point.  The index "MUST" but the one
-        # associated with our server hostname. If one doesn't exist; create
+        # begin fetching from that point. If one doesn't exist; create
         # it initialized at 0
 
-        logger.debug('Retrieving information on group %s' % (name))
         gt = session.query(GroupTrack)\
                     .filter(GroupTrack.group_id == _id)\
                     .filter(GroupTrack.server_id == _server.id).first()
 
-
-
         if not gt or reset:
             logger.warning('No GroupTrack found for %s' % (name))
-            # Get an connection to work with
-            con = NNTPConnection(**s)
-
-            _, low, high, _ = con.group(name)
-            if low is None:
-                # Could not set group
-                logger.warning("Could not access group '%s' on '%s'." % (
-                    name,
-                    _server.host,
-                ))
-                continue
-
+            
             # Create a GroupTrack object using the group info
             gt = GroupTrack(
                 group_id=_id,
@@ -365,11 +363,19 @@ def update_search(ctx, groups, date_from, date_to, watched):
             session.add(gt)
             session.commit()
 
-        # Initialize our high/low variables
-        low = gt.low
-        high = gt.high
+        # Update our GroupTrack
+        session.query(GroupTrack)\
+            .filter(GroupTrack.group_id == _id)\
+            .filter(GroupTrack.server_id == _server.id)\
+            .update({
+                GroupTrack.high: high,
+                GroupTrack.last_scan: datetime.now(),
+            })
+        session.commit()
 
-        # starting pointer
+        logger.debug('group info (low/high/cur) : %s/%s/%s' % (low, high, gt.scan_pointer))
+
+        # Initialize our starting pointer
         cur = gt.scan_pointer + 1
 
         requests = []
