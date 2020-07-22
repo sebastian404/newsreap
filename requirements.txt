@@ -5,7 +5,7 @@ pyyaml
 sqlalchemy >= 1.0
 gevent >= 1.1.2
 python-dateutil
-cryptography >= 0.7
+cryptography==2.9.2
 yenc >= 0.4
 lxml >= 3.0
 tqdm
