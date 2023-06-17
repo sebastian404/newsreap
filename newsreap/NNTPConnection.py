@@ -716,6 +716,10 @@ class NNTPConnection(SocketBase):
                 self.group_name = match.group('name')
                 self.group_index = self.group_head
 
+                # fix for some providers who are now returning 0 as for group_head rather than real value.
+                if self.group_head == 0:
+                    self.group_head = 1
+
                 logger.info('Using Group: %s.' % self.group_name)
                 return (
                     self.group_count,
