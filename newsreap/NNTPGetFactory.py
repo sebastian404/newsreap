@@ -186,7 +186,6 @@ class NNTPGetFactory(object):
             # TODO: we need to adjust our health and mode
             pass
 
-
     def load(self, source, hooks=True, groups=None, path=None, work_dir=None,
              *args, **kwargs):
         """
